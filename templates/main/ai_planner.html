@@ -1,0 +1,86 @@
+{% extends "base_studysync.html" %}
+{% block head_extra %}
+<meta name="csrf-token" content="{{ csrf_token() }}"/>
+{% endblock %}
+{% block title %}StudySync — AI Planner{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/studysync_ai.css') }}"/>
+{% endblock %}
+{% block body %}
+{% set active_nav = 'ai' %}
+{% set nm = current_user.full_name or 'User' %}
+{% set parts = nm.split() %}
+{% set user_initials = ((parts[0][0] if parts else 'U') ~ (parts[1][0] if parts|length > 1 else ''))|upper %}
+{% include "partials/app_sidebar.html" %}
+
+<div
+  class="main"
+  id="aiPlannerRoot"
+  data-chat-url="{{ url_for('ai_planner.chat') }}"
+  data-user-initials="{{ user_initials }}"
+  data-user-name="{{ current_user.full_name | e }}"
+>
+  <div class="topbar">
+    <div class="ai-header">
+      <div class="ai-avatar"><i class="fas fa-robot" style="color: white; font-size: 1rem"></i></div>
+      <div>
+        <div class="ai-name">StudySync AI</div>
+        <div class="ai-status"><span class="status-dot"></span> Online · Stub backend</div>
+      </div>
+    </div>
+    <div class="ai-topbar-actions">
+      <button type="button" class="ai-toolbar-btn" id="btnAiClear" title="Clear this chat (local)"><i class="fas fa-trash-alt"></i> Clear</button>
+      <button type="button" class="ai-toolbar-btn" id="btnAiHistory" disabled title="Coming soon"><i class="fas fa-history"></i> History</button>
+    </div>
+  </div>
+
+  <div class="chat-body" id="chatBody">
+    <div class="msg" id="aiWelcomeMsg">
+      <div class="msg-avatar" style="background: linear-gradient(135deg, var(--accent), var(--accent2))">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div>
+        <div class="msg-bubble">
+          Hi <strong>{{ current_user.full_name }}</strong> — I'm your AI study planner. This screen calls
+          <code style="background: rgba(255, 255, 255, 0.1); padding: 1px 5px; border-radius: 4px">/api/planner/chat</code>
+          (stub). Ask about your timetable, exams, or revision; your teammate can swap in a real model later.
+        </div>
+        <div class="msg-time">Just now</div>
+      </div>
+    </div>
+
+    <div class="msg" id="typingIndicator" style="display: none">
+      <div class="msg-avatar" style="background: linear-gradient(135deg, var(--accent), var(--accent2))">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div class="msg-bubble">
+        <div class="typing"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quick-prompts">
+    <button type="button" class="quick-btn" data-quick="What should I focus on this week given my timetable?">This week’s focus</button>
+    <button type="button" class="quick-btn" data-quick="How can I balance assignment deadlines with exam prep?">Balance deadlines</button>
+    <button type="button" class="quick-btn" data-quick="Give me a 90-minute study block plan for tonight.">90‑min plan</button>
+    <button type="button" class="quick-btn" data-quick="Explain Flask blueprints in simple terms.">Flask blueprints</button>
+    <button type="button" class="quick-btn" data-quick="What is the difference between SQLAlchemy flush and commit?">SQLAlchemy flush vs commit</button>
+  </div>
+
+  <div class="chat-input-wrap">
+    <div class="input-row">
+      <textarea
+        class="chat-textarea"
+        id="chatInput"
+        placeholder="Ask about your timetable, exams, or study plan…"
+        rows="1"
+      ></textarea>
+      <button type="button" class="send-btn" id="btnSendChat" aria-label="Send"><i class="fas fa-paper-plane"></i></button>
+    </div>
+    <div class="input-hint">Press <strong>Enter</strong> to send · <strong>Shift+Enter</strong> for a new line</div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/studysync_ai.js') }}"></script>
+{% endblock %}

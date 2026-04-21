@@ -1,0 +1,145 @@
+{% extends "base_auth.html" %}
+{% block head_extra %}
+<meta name="csrf-token" content="{{ csrf_token() }}"/>
+{% endblock %}
+{% block title %}StudySync — Sign in{% endblock %}
+{% block body %}
+<div class="left-panel">
+  <div class="brand"><i class="fas fa-calendar-alt"></i> StudySync</div>
+  <div class="hero-text">
+    <h1>Your campus life,<br/><span>smartly organised.</span></h1>
+    <p>Timetable, exam prep, group collaboration, and AI planning — Flask + SQLite + AJAX.</p>
+  </div>
+  <div class="feature-pills">
+    <div class="pill">
+      <div class="pill-icon" style="background:rgba(79,142,247,0.15);color:var(--accent)"><i class="fas fa-calendar-week"></i></div>
+      <span>Visual weekly timetable with exam tracking</span>
+    </div>
+    <div class="pill">
+      <div class="pill-icon" style="background:rgba(124,92,252,0.15);color:var(--accent2)"><i class="fas fa-robot"></i></div>
+      <span>AI study planner that schedules your revision</span>
+    </div>
+    <div class="pill">
+      <div class="pill-icon" style="background:rgba(224,64,251,0.15);color:var(--pink)"><i class="fas fa-users"></i></div>
+      <span>See your group's schedule &amp; find meeting times</span>
+    </div>
+  </div>
+</div>
+
+<div class="right-panel">
+  <div class="auth-box">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} mb-2 py-2" role="alert" style="font-size:0.85rem;">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <h2 id="authHeading" style="font-family:'Sora',sans-serif;font-weight:700;font-size:1.6rem;margin-bottom:8px;color:var(--text);">Welcome back</h2>
+    <p id="authSub" style="color:var(--muted);font-size:0.9rem;margin-bottom:28px;">Sign in to your StudySync account</p>
+
+    <div class="tab-switcher">
+      <button type="button" class="tab-btn active" data-tab="login">Sign In</button>
+      <button type="button" class="tab-btn" data-tab="register">Create Account</button>
+    </div>
+
+    <div id="loginForm" class="fade-in">
+      <form method="post" action="{{ url_for('auth.login_submit') }}" novalidate>
+        {{ login_form.hidden_tag() }}
+        <div class="mb-4-custom">
+          <label class="form-label" for="{{ login_form.email.id }}">Email Address</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+            {{ login_form.email(class="form-control", placeholder="you@student.uwa.edu.au") }}
+          </div>
+          {% for err in login_form.email.errors %}<div class="field-error">{{ err }}</div>{% endfor %}
+        </div>
+        <div class="mb-4-custom">
+          <label class="form-label" for="{{ login_form.password.id }}">Password</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+            {{ login_form.password(class="form-control", placeholder="••••••••") }}
+          </div>
+          {% for err in login_form.password.errors %}<div class="field-error">{{ err }}</div>{% endfor %}
+        </div>
+        <div style="text-align:right;margin-bottom:20px;">
+          <span style="color:var(--muted);font-size:0.85rem;">Forgot password? Not implemented.</span>
+        </div>
+        {{ login_form.submit(class="btn-primary-custom", value="Sign In") }}
+      </form>
+      <div class="divider">or continue with</div>
+      <button type="button" class="btn-outline-custom" disabled title="Not implemented"><img src="https://www.google.com/favicon.ico" width="16" height="16" alt=""/> Google</button>
+    </div>
+
+    <div id="registerForm">
+      <form method="post" action="{{ url_for('auth.register_submit') }}" novalidate>
+        {{ register_form.hidden_tag() }}
+        <div class="mb-4-custom">
+          <label class="form-label" for="{{ register_form.full_name.id }}">Full Name</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-user"></i></span>
+            {{ register_form.full_name(class="form-control", placeholder="Jane Smith") }}
+          </div>
+          {% for err in register_form.full_name.errors %}<div class="field-error">{{ err }}</div>{% endfor %}
+        </div>
+        <div class="mb-4-custom">
+          <label class="form-label" for="{{ register_form.student_id.id }}">Student ID</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+            {{ register_form.student_id(class="form-control", placeholder="23XXXXXX (optional)") }}
+          </div>
+          {% for err in register_form.student_id.errors %}<div class="field-error">{{ err }}</div>{% endfor %}
+        </div>
+        <div class="mb-4-custom">
+          <label class="form-label" for="{{ register_form.email.id }}">Email Address</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+            {{ register_form.email(class="form-control", placeholder="you@student.uwa.edu.au") }}
+          </div>
+          {% for err in register_form.email.errors %}<div class="field-error">{{ err }}</div>{% endfor %}
+        </div>
+        <div class="mb-4-custom">
+          <label class="form-label" for="{{ register_form.password.id }}">Password</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+            {{ register_form.password(class="form-control", placeholder="Min. 8 characters") }}
+          </div>
+          {% for err in register_form.password.errors %}<div class="field-error">{{ err }}</div>{% endfor %}
+        </div>
+        {{ register_form.submit(class="btn-primary-custom", value="Create Account") }}
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+  (function () {
+    const initial = "{{ tab }}";
+    const heading = document.getElementById("authHeading");
+    const sub = document.getElementById("authSub");
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const btns = document.querySelectorAll(".tab-btn");
+
+    function show(tab) {
+      const isLogin = tab === "login";
+      loginForm.style.display = isLogin ? "block" : "none";
+      registerForm.style.display = isLogin ? "none" : "block";
+      btns.forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+      if (isLogin) {
+        heading.textContent = "Welcome back";
+        sub.textContent = "Sign in to your StudySync account";
+      } else {
+        heading.textContent = "Get started";
+        sub.textContent = "Create your free StudySync account";
+      }
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", tab);
+      window.history.replaceState({}, "", url);
+    }
+
+    btns.forEach((b) => b.addEventListener("click", () => show(b.dataset.tab)));
+    show(initial === "register" ? "register" : "login");
+  })();
+</script>
+{% endblock %}

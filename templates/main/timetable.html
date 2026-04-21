@@ -1,0 +1,106 @@
+{% extends "base_studysync.html" %}
+{% block head_extra %}
+<meta name="csrf-token" content="{{ csrf_token() }}"/>
+{% endblock %}
+{% block title %}StudySync — Timetable{% endblock %}
+{% block body %}
+{% set active_nav = 'timetable' %}
+{% include "partials/app_sidebar.html" %}
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="page-title">Timetable</div>
+      <div class="view-toggle" title="List view coming soon">
+        <button type="button" class="view-btn active" disabled><i class="fas fa-th"></i></button>
+        <button type="button" class="view-btn" disabled><i class="fas fa-bars"></i></button>
+      </div>
+      <div class="nav-arrows">
+        <button type="button" class="arrow-btn" id="btnPrevWeek" aria-label="Previous week"><i class="fas fa-chevron-left"></i></button>
+        <button type="button" class="arrow-btn" id="btnNextWeek" aria-label="Next week"><i class="fas fa-chevron-right"></i></button>
+      </div>
+      <div class="date-range"><i class="fas fa-calendar" style="margin-right:6px;color:var(--muted)"></i><span id="tt-date-range">Week</span></div>
+    </div>
+    <button type="button" class="btn-create" id="btnCreateEvent"><i class="fas fa-plus"></i> Create Event</button>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-icon" title="Filter by type"><i class="fas fa-filter"></i></div>
+    <button type="button" class="filter-tag tag-lecture" data-type="lecture">Lecture</button>
+    <button type="button" class="filter-tag tag-lab" data-type="lab">Laboratory</button>
+    <button type="button" class="filter-tag tag-tutorial" data-type="tutorial">Tutorial</button>
+    <button type="button" class="filter-tag tag-exam" data-type="exam">Exam</button>
+    <button type="button" class="filter-tag tag-assignment" data-type="assignment">Assignment</button>
+    <button type="button" class="filter-tag tag-workshop" data-type="workshop">Workshop</button>
+  </div>
+
+  <div id="loadError" class="alert alert-danger d-none m-3" role="alert" style="background:rgba(220,53,69,0.15);border-color:rgba(220,53,69,0.35);color:#ffb4b4;"></div>
+
+  <div class="calendar-wrap">
+    <div id="tt-week-header" class="tt-week-header"></div>
+    <div class="tt-week-body">
+      <div id="tt-time-ruler" class="tt-time-ruler"></div>
+      <div id="tt-day-panels" class="tt-day-panels"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-bg-dark border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" id="eventModalTitle">Create event</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="evId" value=""/>
+        <div class="mb-2">
+          <label class="form-label small mb-0">Title</label>
+          <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary" id="evTitle" required/>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small mb-0">Type</label>
+          <select class="form-select form-select-sm bg-dark text-light border-secondary" id="evType">
+            <option value="lecture">Lecture</option>
+            <option value="lab">Laboratory</option>
+            <option value="tutorial">Tutorial</option>
+            <option value="exam">Exam</option>
+            <option value="assignment">Assignment</option>
+            <option value="workshop">Workshop</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="row g-2">
+          <div class="col-md-6">
+            <label class="form-label small mb-0">Start</label>
+            <input type="datetime-local" class="form-control form-control-sm bg-dark text-light border-secondary" id="evStart"/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small mb-0">End</label>
+            <input type="datetime-local" class="form-control form-control-sm bg-dark text-light border-secondary" id="evEnd"/>
+          </div>
+        </div>
+        <div class="mt-2">
+          <label class="form-label small mb-0">Location</label>
+          <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary" id="evLocation" placeholder="Room / link"/>
+        </div>
+        <div class="mt-2">
+          <label class="form-label small mb-0">Notes</label>
+          <textarea class="form-control form-control-sm bg-dark text-light border-secondary" id="evNotes" rows="2"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer border-secondary d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-sm d-none" id="btnDeleteEvent">Delete</button>
+        <div class="ms-auto">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btnSaveEvent">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/studysync_timetable.js') }}"></script>
+{% endblock %}

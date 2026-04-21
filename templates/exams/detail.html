@@ -1,0 +1,75 @@
+{% extends "base_studysync.html" %}
+{% block head_extra %}
+<meta name="csrf-token" content="{{ csrf_token() }}"/>
+{% endblock %}
+{% block title %}StudySync — {{ exam.title }}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/studysync_exams.css') }}"/>
+{% endblock %}
+{% block body %}
+{% set active_nav = 'exams' %}
+{% include "partials/app_sidebar.html" %}
+
+<div class="main" id="examDetailRoot" data-exam-id="{{ exam.id }}" data-starts-at="{{ exam.starts_at.isoformat(timespec='seconds') }}">
+  <div class="topbar">
+    <div class="topbar-left">
+      <nav class="breadcrumb-nav" aria-label="breadcrumb">
+        <a href="{{ url_for('exams.list_exams') }}">Exams</a>
+        <span class="sep"><i class="fas fa-chevron-right"></i></span>
+        <span style="color:var(--text);">{{ exam.title }}</span>
+      </nav>
+    </div>
+    <button type="button" class="btn btn-sm btn-outline-danger" id="btnDeleteExam" style="font-size:0.82rem;">Delete exam</button>
+  </div>
+
+  <div id="examDetailError" class="alert alert-danger d-none m-3" role="alert" style="background:rgba(220,53,69,0.15);border-color:rgba(220,53,69,0.35);color:#ffb4b4;"></div>
+
+  <div class="exam-content">
+    <div class="left-col">
+      <div class="exam-hero">
+        <span class="exam-badge"><i class="fas fa-file-alt"></i> Exam session</span>
+        <h1 class="exam-title">{{ exam.title }}</h1>
+        {% if exam.course_code %}
+        <div class="text-muted" style="font-size:0.9rem;">{{ exam.course_code }}</div>
+        {% endif %}
+        <div class="exam-meta">
+          <span class="meta-item"><i class="fas fa-clock"></i> {{ exam.starts_at.strftime('%d %b %Y, %H:%M') }} — {{ exam.ends_at.strftime('%H:%M') }}</span>
+          {% if exam.location %}
+          <span class="meta-item"><i class="fas fa-map-marker-alt"></i> {{ exam.location }}</span>
+          {% endif %}
+          {% if exam.weight_percent is not none %}
+          <span class="meta-item"><i class="fas fa-percentage"></i> {{ exam.weight_percent }}% weight</span>
+          {% endif %}
+        </div>
+        <div class="countdown-strip" id="countdownStrip" aria-live="polite">
+          <div class="count-box"><div class="count-num" id="cdDays">—</div><div class="count-label">Days</div></div>
+          <div class="count-box"><div class="count-num" id="cdHours">—</div><div class="count-label">Hours</div></div>
+          <div class="count-box"><div class="count-num" id="cdMins">—</div><div class="count-label">Mins</div></div>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <div class="section-title"><i class="fas fa-tasks"></i> Revision checklist</div>
+        {% for t in topics %}
+        <div class="checklist-item {% if t.status == 'done' %}done{% endif %}" data-topic-id="{{ t.id }}" data-status="{{ t.status }}">
+          <div class="check-box" role="checkbox" aria-checked="{% if t.status == 'done' %}true{% else %}false{% endif %}" tabindex="0">
+            {% if t.status == 'done' %}<i class="fas fa-check"></i>{% endif %}
+          </div>
+          <span class="check-label">{{ t.label }}</span>
+          <input type="range" class="form-range topic-progress" min="0" max="100" value="{{ t.progress_percent }}" aria-label="Topic progress"/>
+        </div>
+        {% endfor %}
+        <button type="button" class="add-topic-btn" id="btnAddTopic"><i class="fas fa-plus"></i> Add revision topic</button>
+      </div>
+
+      <div class="card-section">
+        <div class="section-title"><i class="fas fa-sticky-note"></i> Notes</div>
+        <textarea class="notes-area" id="examNotes" placeholder="Exam notes, formulas, links…">{{ exam.notes or '' }}</textarea>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/studysync_exams_detail.js') }}"></script>
+{% endblock %}

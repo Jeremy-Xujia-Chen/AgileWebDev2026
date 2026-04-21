@@ -1,0 +1,166 @@
+{% extends "base_studysync.html" %}
+{% block head_extra %}
+<meta name="csrf-token" content="{{ csrf_token() }}"/>
+{% endblock %}
+{% block title %}StudySync — My Group{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/studysync_group.css') }}"/>
+{% endblock %}
+{% block body %}
+{% set active_nav = 'group' %}
+{% include "partials/app_sidebar.html" %}
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left" style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div class="page-title">My Group</div>
+      <select id="groupSelect" class="form-select form-select-sm d-none" style="max-width:240px;background:rgba(255,255,255,0.06);border-color:var(--border);color:var(--text);font-size:0.85rem;"></select>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+      <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalCreateGroup" style="border-color:var(--border);color:var(--muted);"><i class="fas fa-plus"></i> New group</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalJoinGroup" style="border-color:var(--border);color:var(--muted);"><i class="fas fa-sign-in-alt"></i> Join</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary d-none" id="btnLeaveGroup" style="border-color:var(--border);color:var(--muted);">Leave group</button>
+      <button type="button" class="btn-invite d-none" id="btnInviteCode"><i class="fas fa-link"></i> Copy join code</button>
+    </div>
+  </div>
+
+  <div id="groupError" class="alert alert-danger d-none m-3" role="alert" style="background:rgba(220,53,69,0.15);border-color:rgba(220,53,69,0.35);color:#ffb4b4;"></div>
+
+  <div id="panelNoGroup" class="no-group-panel">
+    <p style="font-size:1rem;color:var(--text);margin-bottom:8px;">You are not in a study group yet.</p>
+    <p>Create one and share the code, or join an existing group.</p>
+    <div class="no-group-actions">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreateGroup"><i class="fas fa-plus"></i> Create group</button>
+      <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#modalJoinGroup"><i class="fas fa-sign-in-alt"></i> Join with code</button>
+    </div>
+  </div>
+
+  <div id="panelGroup" class="d-none">
+    <div class="group-content">
+      <div class="left-col">
+        <div class="group-info-card">
+          <div class="group-name" id="dispGroupName">—</div>
+          <div class="group-code">Join code: <strong style="color:var(--accent)" id="dispJoinCode">—</strong></div>
+          <div class="member-stack" id="memberStack"></div>
+          <div class="group-stat"><strong id="dispMemberCount">0</strong> members · merged timetable for everyone in this group</div>
+        </div>
+        <div class="section-header"><i class="fas fa-users"></i> Members</div>
+        <div id="memberList"></div>
+      </div>
+
+      <div class="right-col">
+        <div class="free-slot-card">
+          <div class="free-slot-title"><i class="fas fa-magic"></i> Common free slots (Mon–Fri, 8:00–20:00)</div>
+          <div class="slot-pills" id="freeSlotPills"><span class="text-muted small">Loading…</span></div>
+        </div>
+
+        <div class="shared-grid">
+          <div class="grid-toolbar">
+            <div class="grid-toolbar-title" id="mergedWeekTitle">Group timetable</div>
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+              <div class="week-nav-g">
+                <button type="button" id="btnPrevWeekG" aria-label="Previous week"><i class="fas fa-chevron-left"></i></button>
+                <button type="button" id="btnNextWeekG" aria-label="Next week"><i class="fas fa-chevron-right"></i></button>
+              </div>
+              <div class="legend-mini">
+                <span><span class="legend-swatch" style="background:rgba(79,142,247,0.45)"></span>Lecture</span>
+                <span><span class="legend-swatch" style="background:rgba(255,107,53,0.45)"></span>Lab</span>
+                <span><span class="legend-swatch" style="background:rgba(38,208,124,0.3)"></span>All free</span>
+              </div>
+            </div>
+          </div>
+          <div class="grid-header">
+            <div class="grid-day"></div>
+            <div class="grid-day" data-dow="0">Mon</div>
+            <div class="grid-day" data-dow="1">Tue</div>
+            <div class="grid-day" data-dow="2">Wed</div>
+            <div class="grid-day" data-dow="3">Thu</div>
+            <div class="grid-day" data-dow="4">Fri</div>
+          </div>
+          <div class="grid-body" id="mergedGridBody"></div>
+        </div>
+
+        <div class="tasks-panel">
+          <div class="tasks-head">
+            <span><i class="fas fa-tasks" style="color:var(--accent);margin-right:8px"></i>Group tasks</span>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="btnOpenAddTask" style="font-size:0.75rem;"><i class="fas fa-plus"></i> Add</button>
+          </div>
+          <div id="taskList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create -->
+<div class="modal fade" id="modalCreateGroup" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-card">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif;">Create study group</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label small text-muted">Group name</label>
+        <input type="text" class="form-control" id="inputCreateName" placeholder="e.g. CITS3403 Study Crew" style="background:rgba(255,255,255,0.06);border-color:var(--border);color:var(--text);"/>
+        <div id="createGroupErr" class="text-danger small mt-2 d-none"></div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-sm btn-primary" id="btnCreateGroupSubmit">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Join -->
+<div class="modal fade" id="modalJoinGroup" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-card">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif;">Join with code</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label small text-muted">8-character code</label>
+        <input type="text" class="form-control text-uppercase" id="inputJoinCode" maxlength="12" placeholder="ABCD1234" style="background:rgba(255,255,255,0.06);border-color:var(--border);color:var(--text);"/>
+        <div id="joinGroupErr" class="text-danger small mt-2 d-none"></div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-sm btn-primary" id="btnJoinGroupSubmit">Join</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add task -->
+<div class="modal fade" id="modalAddTask" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-card">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif;">New task</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label small text-muted">Title</label>
+        <input type="text" class="form-control mb-2" id="inputTaskTitle" style="background:rgba(255,255,255,0.06);border-color:var(--border);color:var(--text);"/>
+        <label class="form-label small text-muted">Assignee (optional)</label>
+        <select class="form-select mb-2" id="selectTaskAssignee" style="background:rgba(255,255,255,0.06);border-color:var(--border);color:var(--text);">
+          <option value="">— Unassigned —</option>
+        </select>
+        <label class="form-label small text-muted">Due date (optional)</label>
+        <input type="date" class="form-control" id="inputTaskDue" style="background:rgba(255,255,255,0.06);border-color:var(--border);color:var(--text);"/>
+        <div id="addTaskErr" class="text-danger small mt-2 d-none"></div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-sm btn-primary" id="btnAddTaskSubmit">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/studysync_group.js') }}"></script>
+{% endblock %}

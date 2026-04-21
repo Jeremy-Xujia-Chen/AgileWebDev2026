@@ -1,0 +1,19 @@
+{% extends "base_studysync.html" %}
+{% block title %}{{ page_title }} — StudySync{% endblock %}
+{% block body %}
+{% set active_nav = active %}
+{% include "partials/app_sidebar.html" %}
+<div class="main">
+  <div class="topbar" style="justify-content:flex-start;">
+    <div class="page-title">{{ page_title }}</div>
+  </div>
+  <div class="calendar-wrap" style="padding:28px;">
+    <p style="color:var(--muted);max-width:560px;line-height:1.6;">
+      This URL is handled by Flask, but the polished UI from the repo-root prototype
+      <code>{{ hint_file|default('prototype.html') }}</code> has not been fully migrated into
+      <code>templates/</code> yet. That static file is still there for layout and copy reference.
+    </p>
+    <a class="btn-create" style="display:inline-flex;text-decoration:none;" href="{{ url_for('main.timetable') }}"><i class="fas fa-calendar-week"></i> Back to Timetable</a>
+  </div>
+</div>
+{% endblock %}

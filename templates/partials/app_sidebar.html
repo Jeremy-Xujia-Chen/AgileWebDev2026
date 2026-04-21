@@ -1,0 +1,30 @@
+{# Expects: active_nav in {'timetable','ai','group','courses','exams','reminders','settings'} #}
+{% set nm = current_user.full_name or 'User' %}
+{% set parts = nm.split() %}
+{% set initials = ((parts[0][0] if parts else 'U') ~ (parts[1][0] if parts|length > 1 else ''))|upper %}
+<nav class="sidebar">
+  <div class="brand"><i class="fas fa-calendar-alt"></i> StudySync</div>
+  <span class="nav-section-label">Main</span>
+  <a href="{{ url_for('main.timetable') }}" class="nav-item {% if active_nav == 'timetable' %}active{% endif %}"><i class="fas fa-calendar-week"></i> Timetable</a>
+  <a href="{{ url_for('main.ai_planner_page') }}" class="nav-item {% if active_nav == 'ai' %}active{% endif %}"><i class="fas fa-robot"></i> AI Planner</a>
+  <a href="{{ url_for('main.group_page') }}" class="nav-item {% if active_nav == 'group' %}active{% endif %}"><i class="fas fa-users"></i> My Group</a>
+  <span class="nav-section-label">Personal</span>
+  <a href="#" class="nav-item text-muted" title="Coming soon"><i class="fas fa-book-open"></i> Courses</a>
+  <a href="{{ url_for('exams.list_exams') }}" class="nav-item {% if active_nav == 'exams' %}active{% endif %}"><i class="fas fa-file-alt"></i> Exams &amp; Tasks</a>
+  <a href="#" class="nav-item text-muted" title="Coming soon"><i class="fas fa-bell"></i> Reminders</a>
+  <span class="nav-section-label">Settings</span>
+  <a href="#" class="nav-item text-muted" title="Coming soon"><i class="fas fa-cog"></i> Preferences</a>
+  <div class="sidebar-bottom">
+    <div class="user-chip">
+      <div class="avatar">{{ initials }}</div>
+      <div>
+        <div style="font-size:0.82rem;font-weight:600;">{{ current_user.full_name }}</div>
+        <div style="font-size:0.72rem;color:var(--muted);">{{ current_user.student_id or current_user.email }}</div>
+      </div>
+    </div>
+    <form method="post" action="{{ url_for('auth.logout') }}" class="mt-2">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <button type="submit" class="btn btn-sm btn-outline-secondary w-100" style="font-size:0.78rem;border-color:var(--border);color:var(--muted);">Log out</button>
+    </form>
+  </div>
+</nav>
