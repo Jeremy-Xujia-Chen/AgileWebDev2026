@@ -62,12 +62,13 @@
           {% for err in login_form.password.errors %}<div class="field-error">{{ err }}</div>{% endfor %}
         </div>
         <div style="text-align:right;margin-bottom:20px;">
-          <span style="color:var(--muted);font-size:0.85rem;">Forgot password? Not implemented.</span>
+          <span class="text-muted" style="font-size:0.85rem;" title="Email-based reset is not configured">Forgot password? <span style="color:var(--muted);">Use your existing password or register a new account.</span></span>
         </div>
         {{ login_form.submit(class="btn-primary-custom", value="Sign In") }}
       </form>
+      <p class="text-muted small mt-2 mb-1" style="font-size:0.8rem;">Social sign-in is not available in this project build.</p>
       <div class="divider">or continue with</div>
-      <button type="button" class="btn-outline-custom" disabled title="Not implemented"><img src="https://www.google.com/favicon.ico" width="16" height="16" alt=""/> Google</button>
+      <button type="button" class="btn-outline-custom" disabled title="Not configured" aria-disabled="true"><img src="https://www.google.com/favicon.ico" width="16" height="16" alt=""/> Google</button>
     </div>
 
     <div id="registerForm">

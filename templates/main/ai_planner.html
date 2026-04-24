@@ -30,7 +30,7 @@
     </div>
     <div class="ai-topbar-actions">
       <button type="button" class="ai-toolbar-btn" id="btnAiClear" title="Clear this chat (local)"><i class="fas fa-trash-alt"></i> Clear</button>
-      <button type="button" class="ai-toolbar-btn" id="btnAiHistory" disabled title="Coming soon"><i class="fas fa-history"></i> History</button>
+      <button type="button" class="ai-toolbar-btn" id="btnAiHistory" data-bs-toggle="modal" data-bs-target="#aiHistoryModal" title="This browser session (local)"><i class="fas fa-history"></i> History</button>
     </div>
   </div>
 
@@ -65,6 +65,21 @@
     <button type="button" class="quick-btn" data-quick="Give me a 90-minute study block plan for tonight.">90‑min plan</button>
     <button type="button" class="quick-btn" data-quick="Explain Flask blueprints in simple terms.">Flask blueprints</button>
     <button type="button" class="quick-btn" data-quick="What is the difference between SQLAlchemy flush and commit?">SQLAlchemy flush vs commit</button>
+  </div>
+
+  <div class="modal fade" id="aiHistoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content" style="background:var(--card, #111f30); border:1px solid var(--border); color:var(--text);">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title" style="font-family:'Sora',sans-serif;">Message history (this tab)</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted small">Last turns you sent and the assistant replied to (sessionStorage). Cleared with <strong>Clear</strong>.</p>
+          <pre id="aiHistoryPre" class="p-2 rounded" style="background:rgba(0,0,0,0.3); font-size:0.8rem; max-height:50vh; white-space:pre-wrap;"></pre>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="chat-input-wrap">

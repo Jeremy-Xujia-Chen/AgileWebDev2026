@@ -335,3 +335,18 @@
   }
   .tt-events-layer { position: absolute; inset: 0; pointer-events: none; }
   .tt-events-layer .event { pointer-events: auto; }
+
+  .tt-list-table thead th {
+    color: var(--muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 10px 8px;
+  }
+  .tt-list-table tbody td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 10px 8px;
+    vertical-align: middle;
+  }
+  .tt-list-table tbody tr:hover { background: rgba(79, 142, 247, 0.08); }

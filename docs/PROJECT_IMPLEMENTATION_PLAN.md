@@ -247,7 +247,7 @@ AgileWebDev2026/
 - [x] `requirements.txt`、`run.py`、`create_app`、配置从环境变量读取（含 `python-dotenv`）。
 - [x] 注册 **AI Planner 占位蓝图**（`POST /api/planner/chat`，见第 8 节；实现文件 `app/blueprints/ai_planner_stub.py`）。
 - [x] `pytest.ini`（`pythonpath = .`）与最小冒烟测试 `tests/test_smoke.py`。
-- [ ] `templates/` + `static/` 目录就绪；README 随仓库更新（组员表待填）。
+- [x] `templates/` + `static/` 目录与 StudySync 主题；README 随仓库更新（组员表仍待填）。
 - **验收**：`flask run` 可访问 `/health` 与占位 AI；`pytest` 通过。
 
 ### Phase 1 — 用户认证与 CSRF
@@ -266,24 +266,24 @@ AgileWebDev2026/
 - [x] 周范围 API：`GET /api/timetable/events?week_start=YYYY-MM-DD`（自动归一化到当周周一；周一至周五重叠查询）。
 - [x] `POST /api/timetable/events`、`PATCH/DELETE /api/timetable/events/<id>`；未登录访问 `/api/*` 返回 **401 JSON**（`unauthorized_handler`）。
 - [x] `/timetable` 页面：jQuery `$.ajaxSetup` 发送 **`X-CSRFToken`**；周切换、五列日视图、Bootstrap Modal 增删改。
-- [ ] 类型筛选条、与根目录 `timetable.html` 完全一致的网格布局（可选增强）。
+- [x] 类型筛选条；[ ] 与 `source_pages/timetable.html` 或列表视图完全 1:1 对齐（可选）。
 - **验收**：多用户数据隔离；他人无法改删你的事件；`pytest` 含课表 API 测试。
 
 ### Phase 3 — 考试与备考
 
-- [ ] `exam_sessions`、`revision_topics`、`exam_notes`、`exam_resources`。
-- [ ] 列表页 + 详情页与现有 `exam_detail` 信息架构对齐。
-- [ ] 倒计时、进度条、清单勾选、笔记与资源的 AJAX 保存。
-- [ ]（可选）`share_token` 只读页给组内成员。
+- [x] `exam_sessions`、`revision_topics`；考试说明字段在 `ExamSession.notes`；**未**单独建 `exam_notes` / `exam_resources` 表（见 `docs/SOURCE_PAGES_GAP_ANALYSIS.md`）。
+- [x] 列表页 + 详情页 + JSON API，与 `source_pages/exam_detail.html` 核心流程对齐；可选增强见 gap 文档。
+- [x] 清单（主题）与元数据、笔记类字段的保存（AJAX）。
+- [ ]（可选）`share_token` 只读页、独立资源表、按主题细颗粒笔记。
 - **验收**：刷新页面数据仍在；权限正确。
 
 ### Phase 4 — 小组与「查看他人数据」
 
-- [ ] 创建小组、加入码、加入流程。
-- [ ] 合并课表 API + 页面展示。
-- [ ] 公共空闲接口 + UI「Book」创建共享块（最简：写入各成员一条相同时段事件，或一条「组事件」表）。
-- [ ] `group_tasks` CRUD；组员可见彼此任务。
-- **验收**：用户 A 能看到同组成员课表摘要/任务；不能改他人私人事件（除非定义组权限）。
+- [x] 创建小组、加入码、加入/离开、成员列表。
+- [x] 合并课表 API + 页面；公共空闲 `GET` + 展示。
+- [ ] UI「**Book**」在空闲段创建共享日历块（见实现方案 §5 与 `SOURCE_PAGES_GAP_ANALYSIS.md`）。
+- [x] `group_tasks` API + 页面列表；[ ] 更细权限/指派展示按需。
+- **验收**：同组成员可看见合并与任务；他人不可改你私有课表项。
 
 ### Phase 5 — 课程、提醒、偏好（按需裁剪）
 
@@ -293,9 +293,9 @@ AgileWebDev2026/
 
 ### Phase 6 — 测试、安全自查、README
 
-- [ ] 单元测试：模型、auth、空闲算法、API 权限等（≥5）。
-- [ ] Selenium：登录、创建事件、打开备考页、加入小组、查看合并课表等（≥5）。
-- [ ] 自查：`.env.example`、无密钥入库、`instance/` 被忽略。
+- [x] 单元 / API 测试集（`tests/test_*.py`），含 auth、课表、考试、小组等（≥5）。
+- [x] Selenium E2E（`tests/selenium/`，7 条）：健康检查、注册、登录、课表创建、考试导航、**创建小组**、登出。需本机 **Chrome**；`TestConfig` 中 SQLite 使用 `check_same_thread=False` 以配合线程内 E2E 服务。
+- [ ] 进一步自查与 README：组员表、生产 `SECRET_KEY` 等（`.env.example`、`instance/` 已忽略时勾选）。
 
 ---
 
@@ -389,11 +389,11 @@ AgileWebDev2026/
 
 ---
 
-## 11. 下一步（立即执行项）
+## 11. 下一步（与仓库同步，2026-04）
 
-1. 完成 **Phase 0**：Flask 骨架、依赖、`/health`、`POST /api/planner/chat` 占位。
-2. 将根目录 HTML **复制**到 `templates/prototypes/`（可选）或逐步改为 Jinja，避免一次大改。
-3. 从 **Phase 1** 开始写 `User` 与 auth 蓝图，跑通注册登录。
+1. 队友：**AI Planner** 按第 8 节替换 `stub` 实现，前端保持 `POST /api/planner/chat`。
+2. 产品：对照 **`source_pages/`** 的设想与 **[`docs/SOURCE_PAGES_GAP_ANALYSIS.md`](SOURCE_PAGES_GAP_ANALYSIS.md)** 决定组页面 **Book**、考试资源表、侧栏 **Courses/Reminders** 等待办。
+3. 交作业前：填 README 组员、再次跑通 **`pytest`（含 Selenium，需 Chrome）**。
 
 ---
 

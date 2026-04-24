@@ -12,7 +12,10 @@
 
   $.ajaxSetup({
     beforeSend: function (xhr, settings) {
-      if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !settings.crossDomain) {
+      if (
+        !/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) &&
+        !settings.crossDomain
+      ) {
         xhr.setRequestHeader("X-CSRFToken", csrf());
       }
     },
@@ -89,7 +92,18 @@
   }
 
   function evClass(t) {
-    if (["lecture", "lab", "tutorial", "exam", "assignment", "workshop", "other"].includes(t)) return "ev-" + t;
+    if (
+      [
+        "lecture",
+        "lab",
+        "tutorial",
+        "exam",
+        "assignment",
+        "workshop",
+        "other",
+      ].includes(t)
+    )
+      return "ev-" + t;
     return "ev-other";
   }
 
@@ -106,7 +120,8 @@
   }
 
   function buildWeekHeader() {
-    let html = '<div class="day-header" style="background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);"></div>';
+    let html =
+      '<div class="day-header" style="background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);"></div>';
     const today = startOfDay(new Date()).getTime();
     for (let i = 0; i < 5; i++) {
       const d = addDaysLocal(currentMonday, i);
@@ -144,7 +159,15 @@
   }
 
   function minutesSinceStartHour(dt) {
-    const base = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), START_HOUR, 0, 0, 0);
+    const base = new Date(
+      dt.getFullYear(),
+      dt.getMonth(),
+      dt.getDate(),
+      START_HOUR,
+      0,
+      0,
+      0,
+    );
     return (dt - base) / 60000;
   }
 
@@ -158,6 +181,46 @@
       if (hiddenTypes.has(t)) $(this).hide();
       else $(this).show();
     });
+    renderListView();
+  }
+
+  function renderListView() {
+    const $tb = $("#ttListBody");
+    if (!$tb.length) return;
+    $tb.empty();
+    const evs = (lastEvents || []).slice().sort(function (a, b) {
+      return new Date(String(a.start_at).replace(" ", "T")) - new Date(String(b.start_at).replace(" ", "T"));
+    });
+    evs.forEach(function (ev) {
+      if (hiddenTypes.has(ev.event_type)) return;
+      const s = new Date(String(ev.start_at).replace(" ", "T"));
+      const tr = $("<tr></tr>").css("cursor", "pointer");
+      tr.append(
+        $("<td></td>").text(
+          s.toLocaleString(undefined, {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        )
+      );
+      tr.append($("<td></td>").text(ev.title));
+      tr.append($("<td></td>").text(typeLabel(ev.event_type)));
+      tr.on("click", function () {
+        openEdit(ev);
+      });
+      $tb.append(tr);
+    });
+  }
+
+  function setView(mode) {
+    const isGrid = mode === "grid";
+    $("#ttGridWrap").toggleClass("d-none", !isGrid);
+    $("#ttListWrap").toggleClass("d-none", isGrid);
+    $("#btnViewGrid").toggleClass("active", isGrid).attr("aria-pressed", isGrid);
+    $("#btnViewList").toggleClass("active", !isGrid).attr("aria-pressed", !isGrid);
   }
 
   function placeEvent(ev) {
@@ -177,7 +240,9 @@
     const clampedHeight = Math.max(24, Math.min(height, maxTop - clampedTop));
 
     const loc = ev.location
-      ? '<div class="event-loc"><i class="fas fa-map-marker-alt"></i> ' + $("<div/>").text(ev.location).html() + "</div>"
+      ? '<div class="event-loc"><i class="fas fa-map-marker-alt"></i> ' +
+        $("<div/>").text(ev.location).html() +
+        "</div>"
       : "";
 
     const el = $(
@@ -199,7 +264,7 @@
         $("<div/>").text(typeLabel(ev.event_type)).html() +
         "</div>" +
         loc +
-        "</div>"
+        "</div>",
     );
     el.on("click", function () {
       openEdit(ev);
@@ -232,7 +297,15 @@
       .done(function (data) {
         if (data.week_start) {
           const p = String(data.week_start).split("-");
-          currentMonday = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]), 0, 0, 0, 0);
+          currentMonday = new Date(
+            Number(p[0]),
+            Number(p[1]) - 1,
+            Number(p[2]),
+            0,
+            0,
+            0,
+            0,
+          );
           weekRangeLabel();
           buildWeekHeader();
           buildRulerAndPanels();
@@ -241,7 +314,8 @@
       })
       .fail(function (xhr) {
         let msg = "Could not load events.";
-        if (xhr.responseJSON && xhr.responseJSON.error) msg = xhr.responseJSON.error;
+        if (xhr.responseJSON && xhr.responseJSON.error)
+          msg = xhr.responseJSON.error;
         showLoadError(msg);
       });
   }
@@ -295,14 +369,20 @@
     }
     const url = id ? "/api/timetable/events/" + id : "/api/timetable/events";
     const method = id ? "PATCH" : "POST";
-    $.ajax({ url: url, method: method, contentType: "application/json", data: JSON.stringify(payload) })
+    $.ajax({
+      url: url,
+      method: method,
+      contentType: "application/json",
+      data: JSON.stringify(payload),
+    })
       .done(function () {
         bsModal.hide();
         loadWeek();
       })
       .fail(function (xhr) {
         let msg = "Save failed.";
-        if (xhr.responseJSON && xhr.responseJSON.error) msg = xhr.responseJSON.error;
+        if (xhr.responseJSON && xhr.responseJSON.error)
+          msg = xhr.responseJSON.error;
         alert(msg);
       });
   }
@@ -317,7 +397,8 @@
       })
       .fail(function (xhr) {
         let msg = "Delete failed.";
-        if (xhr.responseJSON && xhr.responseJSON.error) msg = xhr.responseJSON.error;
+        if (xhr.responseJSON && xhr.responseJSON.error)
+          msg = xhr.responseJSON.error;
         alert(msg);
       });
   }
@@ -345,6 +426,13 @@
       $(this).addClass("dim");
     }
     applyFilters();
+  });
+
+  $("#btnViewGrid").on("click", function () {
+    setView("grid");
+  });
+  $("#btnViewList").on("click", function () {
+    setView("list");
   });
 
   loadWeek();

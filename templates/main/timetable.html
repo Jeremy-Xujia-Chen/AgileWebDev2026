@@ -11,9 +11,9 @@
   <div class="topbar">
     <div class="topbar-left">
       <div class="page-title">Timetable</div>
-      <div class="view-toggle" title="List view coming soon">
-        <button type="button" class="view-btn active" disabled><i class="fas fa-th"></i></button>
-        <button type="button" class="view-btn" disabled><i class="fas fa-bars"></i></button>
+      <div class="view-toggle" title="Grid or list">
+        <button type="button" class="view-btn active" id="btnViewGrid" aria-pressed="true" aria-label="Grid"><i class="fas fa-th"></i></button>
+        <button type="button" class="view-btn" id="btnViewList" aria-pressed="false" aria-label="List"><i class="fas fa-bars"></i></button>
       </div>
       <div class="nav-arrows">
         <button type="button" class="arrow-btn" id="btnPrevWeek" aria-label="Previous week"><i class="fas fa-chevron-left"></i></button>
@@ -36,12 +36,24 @@
 
   <div id="loadError" class="alert alert-danger d-none m-3" role="alert" style="background:rgba(220,53,69,0.15);border-color:rgba(220,53,69,0.35);color:#ffb4b4;"></div>
 
-  <div class="calendar-wrap">
+  <div id="ttGridWrap" class="calendar-wrap">
     <div id="tt-week-header" class="tt-week-header"></div>
     <div class="tt-week-body">
       <div id="tt-time-ruler" class="tt-time-ruler"></div>
       <div id="tt-day-panels" class="tt-day-panels"></div>
     </div>
+  </div>
+  <div id="ttListWrap" class="calendar-wrap d-none" style="padding:0 12px 24px; overflow-x: auto;">
+    <table class="table table-sm table-borderless tt-list-table" style="min-width: 480px; color: var(--text);">
+      <thead>
+        <tr>
+          <th>When</th>
+          <th>Title</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody id="ttListBody"></tbody>
+    </table>
   </div>
 </div>
 

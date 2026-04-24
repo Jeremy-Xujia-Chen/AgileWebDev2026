@@ -1,0 +1,25 @@
+{% extends "base_studysync.html" %}
+{% block head_extra %}
+<meta name="csrf-token" content="{{ csrf_token() }}"/>
+{% endblock %}
+{% block title %}StudySync — Courses{% endblock %}
+{% block body %}
+{% set active_nav = 'courses' %}
+{% include "partials/app_sidebar.html" %}
+<div class="main" id="coursesRoot">
+  <div class="topbar"><div class="page-title">My courses</div></div>
+  <div class="calendar-wrap" style="padding:20px 28px;">
+    <p class="text-muted small">Your unit codes (reference only).</p>
+    <div class="row g-2 mb-3" style="max-width:520px;">
+      <div class="col-4"><input type="text" class="form-control form-control-sm" id="cCode" placeholder="CITS3403" style="background:rgba(255,255,255,0.06);border-color:var(--border);color:var(--text);"/></div>
+      <div class="col-8"><input type="text" class="form-control form-control-sm" id="cTitle" placeholder="Unit title" style="background:rgba(255,255,255,0.06);border-color:var(--border);color:var(--text);"/></div>
+    </div>
+    <button type="button" class="btn btn-sm btn-primary mb-3" id="btnAddCourse"><i class="fas fa-plus"></i> Add</button>
+    <div id="courseErr" class="alert alert-danger d-none py-2" style="max-width:560px;font-size:0.85rem;"></div>
+    <ul class="list-group" id="courseList" style="max-width:640px;background:transparent;"></ul>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/studysync_portal.js') }}"></script>
+{% endblock %}

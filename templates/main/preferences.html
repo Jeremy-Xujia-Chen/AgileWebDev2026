@@ -1,0 +1,29 @@
+{% extends "base_studysync.html" %}
+{% block head_extra %}
+<meta name="csrf-token" content="{{ csrf_token() }}"/>
+{% endblock %}
+{% block title %}StudySync — Preferences{% endblock %}
+{% block body %}
+{% set active_nav = 'settings' %}
+{% include "partials/app_sidebar.html" %}
+<div class="main" id="prefRoot">
+  <div class="topbar"><div class="page-title">Preferences</div></div>
+  <div class="calendar-wrap" style="padding:20px 28px;max-width:520px;">
+    <p class="text-muted small">Timezone is stored as a label. Week start (0=Mon) is for future use.</p>
+    <div class="mb-3">
+      <label class="form-label small text-muted">Timezone</label>
+      <input type="text" class="form-control form-control-sm" id="prefTz" placeholder="UTC" style="background:rgba(255,255,255,0.06);border-color:var(--border);color:var(--text);"/>
+    </div>
+    <div class="mb-3">
+      <label class="form-label small text-muted">Week starts on (0=Mon … 6=Sun)</label>
+      <input type="number" class="form-control form-control-sm" id="prefWeek" min="0" max="6" style="background:rgba(255,255,255,0.06);border-color:var(--border);color:var(--text);"/>
+    </div>
+    <button type="button" class="btn btn-sm btn-primary" id="btnSavePref">Save</button>
+    <div id="prefOk" class="text-success small mt-2 d-none">Saved.</div>
+    <div id="prefErr" class="alert alert-danger d-none py-2 mt-2" style="font-size:0.85rem;"></div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/studysync_portal.js') }}"></script>
+{% endblock %}

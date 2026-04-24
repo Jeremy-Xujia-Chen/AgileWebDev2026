@@ -5,7 +5,10 @@
 
   $.ajaxSetup({
     beforeSend: function (xhr, settings) {
-      if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !settings.crossDomain) {
+      if (
+        !/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) &&
+        !settings.crossDomain
+      ) {
         xhr.setRequestHeader("X-CSRFToken", csrf());
       }
     },
@@ -63,7 +66,10 @@
         $cb.html(st === "done" ? '<i class="fas fa-check"></i>' : "");
       })
       .fail(function (xhr) {
-        showErr((xhr.responseJSON && xhr.responseJSON.error) || "Could not update topic.");
+        showErr(
+          (xhr.responseJSON && xhr.responseJSON.error) ||
+            "Could not update topic.",
+        );
       });
   });
 
@@ -78,7 +84,10 @@
         contentType: "application/json",
         data: JSON.stringify({ notes: val }),
       }).fail(function (xhr) {
-        showErr((xhr.responseJSON && xhr.responseJSON.error) || "Could not save notes.");
+        showErr(
+          (xhr.responseJSON && xhr.responseJSON.error) ||
+            "Could not save notes.",
+        );
       });
     }, 800);
   });
@@ -88,7 +97,10 @@
     const id = $row.data("topic-id");
     const v = parseInt($(this).val(), 10);
     patchTopic(id, { progress_percent: v }).fail(function (xhr) {
-      showErr((xhr.responseJSON && xhr.responseJSON.error) || "Could not update progress.");
+      showErr(
+        (xhr.responseJSON && xhr.responseJSON.error) ||
+          "Could not update progress.",
+      );
     });
   });
 
@@ -105,7 +117,10 @@
         window.location.reload();
       })
       .fail(function (xhr) {
-        showErr((xhr.responseJSON && xhr.responseJSON.error) || "Could not add topic.");
+        showErr(
+          (xhr.responseJSON && xhr.responseJSON.error) ||
+            "Could not add topic.",
+        );
       });
   });
 
@@ -116,7 +131,9 @@
         window.location.href = "/exams";
       })
       .fail(function (xhr) {
-        showErr((xhr.responseJSON && xhr.responseJSON.error) || "Delete failed.");
+        showErr(
+          (xhr.responseJSON && xhr.responseJSON.error) || "Delete failed.",
+        );
       });
   });
 

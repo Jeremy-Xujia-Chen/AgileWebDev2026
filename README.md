@@ -6,7 +6,7 @@ StudySync is a Flask-based web app for **timetable management**, **exam preparat
 
 ## Purpose and design
 
-See [`docs/PROJECT_IMPLEMENTATION_PLAN.md`](docs/PROJECT_IMPLEMENTATION_PLAN.md) for the full implementation plan, database outline, API list, phased roadmap, and the **AI Planner HTTP contract** (§8).
+See [`docs/PROJECT_IMPLEMENTATION_PLAN.md`](docs/PROJECT_IMPLEMENTATION_PLAN.md) for the full implementation plan, database outline, API list, phased roadmap, and the **AI Planner HTTP contract** (§8). For **static UI mockups** vs the live app, see [`docs/SOURCE_PAGES_GAP_ANALYSIS.md`](docs/SOURCE_PAGES_GAP_ANALYSIS.md) (excludes AI Planner work owned by a teammate).
 
 High-level idea (also in `项目构想.md`): extend a CAS-style weekly timetable with exam prep, collaboration views, and AI-assisted planning.
 
@@ -129,7 +129,7 @@ bash scripts/run_tests.sh -v      # verbose
 bash scripts/run_tests.sh tests/test_timetable.py   # single file
 ```
 
-The unit rubric expects **5+ unit tests** and **5+ Selenium tests**; Selenium will be added later. Current suite is under [`tests/`](tests/).
+The unit rubric expects **5+ unit tests** and **5+ Selenium tests**. The suite is under [`tests/`](tests/); **Selenium** flows live in [`tests/selenium/`](tests/selenium/) (7 scenarios: health, register, login, timetable create, exams nav, **create study group**, logout). They need **Google Chrome** installed; Selenium 4.6+ manages the driver. Run `pytest` from the project root to execute **all** tests, or `pytest tests/selenium` for E2E only. Set `SELENIUM_HEADLESS=0` in the environment to watch the browser. For **threaded** E2E, `TestConfig` allows SQLite in-memory to be used from the Werkzeug worker (`check_same_thread=False`).
 
 ---
 
@@ -146,9 +146,9 @@ The unit rubric expects **5+ unit tests** and **5+ Selenium tests**; Selenium wi
 
 ---
 
-## Prototype HTML (repo root)
+## Prototype HTML (`source_pages/`)
 
-The original **static** mockups (`timetable.html`, `ai_planner.html`, `group.html`, `exam_detail.html`, `login.html`) are still in the **repository root** as design references.
+The **static** mockups (`timetable.html`, `ai_planner.html`, `group.html`, `exam_detail.html`, `login.html`) sit under [`source_pages/`](source_pages/) as design references (AI Planner to be integrated by a teammate; other pages are compared in [`docs/SOURCE_PAGES_GAP_ANALYSIS.md`](docs/SOURCE_PAGES_GAP_ANALYSIS.md)).
 
 - **Timetable:** the Flask page `/timetable` now reuses the same **StudySync** look (sidebar, top bar, filters, dark theme) and wires **real data** via AJAX. You do **not** install those files separately; we **merge** layout/CSS/JS into `templates/` + `static/` over time.
 - **Login:** still served from `templates/auth/login_register.html` (simplified styling). Porting the exact `login.html` look is optional polish.

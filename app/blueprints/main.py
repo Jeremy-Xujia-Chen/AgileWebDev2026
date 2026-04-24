@@ -29,6 +29,24 @@ def group_page():
     return render_template("main/group.html")
 
 
+@bp.get("/courses")
+@login_required
+def courses_page():
+    return render_template("main/courses.html")
+
+
+@bp.get("/reminders")
+@login_required
+def reminders_page():
+    return render_template("main/reminders.html")
+
+
+@bp.get("/preferences")
+@login_required
+def preferences_page():
+    return render_template("main/preferences.html")
+
+
 @bp.get("/api/auth/me")
 def api_auth_me():
     """Lightweight JSON for AJAX clients (GET is CSRF-exempt)."""

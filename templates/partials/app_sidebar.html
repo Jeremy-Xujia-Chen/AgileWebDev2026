@@ -9,11 +9,11 @@
   <a href="{{ url_for('main.ai_planner_page') }}" class="nav-item {% if active_nav == 'ai' %}active{% endif %}"><i class="fas fa-robot"></i> AI Planner</a>
   <a href="{{ url_for('main.group_page') }}" class="nav-item {% if active_nav == 'group' %}active{% endif %}"><i class="fas fa-users"></i> My Group</a>
   <span class="nav-section-label">Personal</span>
-  <a href="#" class="nav-item text-muted" title="Coming soon"><i class="fas fa-book-open"></i> Courses</a>
+  <a href="{{ url_for('main.courses_page') }}" class="nav-item {% if active_nav == 'courses' %}active{% endif %}"><i class="fas fa-book-open"></i> Courses</a>
   <a href="{{ url_for('exams.list_exams') }}" class="nav-item {% if active_nav == 'exams' %}active{% endif %}"><i class="fas fa-file-alt"></i> Exams &amp; Tasks</a>
-  <a href="#" class="nav-item text-muted" title="Coming soon"><i class="fas fa-bell"></i> Reminders</a>
+  <a href="{{ url_for('main.reminders_page') }}" class="nav-item {% if active_nav == 'reminders' %}active{% endif %}"><i class="fas fa-bell"></i> Reminders</a>
   <span class="nav-section-label">Settings</span>
-  <a href="#" class="nav-item text-muted" title="Coming soon"><i class="fas fa-cog"></i> Preferences</a>
+  <a href="{{ url_for('main.preferences_page') }}" class="nav-item {% if active_nav == 'settings' %}active{% endif %}"><i class="fas fa-cog"></i> Preferences</a>
   <div class="sidebar-bottom">
     <div class="user-chip">
       <div class="avatar">{{ initials }}</div>

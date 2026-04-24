@@ -43,6 +43,7 @@ def create_app(config_object=Config) -> Flask:
     from app.blueprints.groups_api import bp as groups_api_bp
     from app.blueprints.main import bp as main_bp
     from app.blueprints.timetable_api import bp as timetable_api_bp
+    from app.blueprints.user_data import bp as user_data_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(exams_bp)
@@ -51,6 +52,7 @@ def create_app(config_object=Config) -> Flask:
     app.register_blueprint(exams_api_bp)
     app.register_blueprint(groups_api_bp)
     app.register_blueprint(ai_planner_bp, url_prefix="/api/planner")
+    app.register_blueprint(user_data_bp)
 
     with app.app_context():
         db.create_all()

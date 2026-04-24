@@ -8,6 +8,40 @@
   const PLAN_COLORS = ["#4f8ef7", "#ffc94a", "#7c5cfc", "#26d07c", "#ff5555"];
 
   let conversationId = null;
+  const HIST_KEY = "studysync_ai_roundtrip";
+
+  function readHistory() {
+    try {
+      const s = sessionStorage.getItem(HIST_KEY);
+      return s ? JSON.parse(s) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveHistoryItem(role, text) {
+    const arr = readHistory();
+    arr.push({
+      at: new Date().toISOString(),
+      role: role,
+      text: String(text).slice(0, 2000),
+    });
+    while (arr.length > 50) arr.shift();
+    try {
+      sessionStorage.setItem(HIST_KEY, JSON.stringify(arr));
+    } catch (e) {}
+  }
+
+  $("#aiHistoryModal").on("show.bs.modal", function () {
+    const arr = readHistory();
+    $("#aiHistoryPre").text(
+      arr.length
+        ? arr.map(function (x) {
+            return "[" + x.at + "] " + x.role + ": " + x.text;
+          }).join("\n\n")
+        : "(No messages yet this session.)"
+    );
+  });
 
   function csrf() {
     return $("meta[name=csrf-token]").attr("content");
@@ -15,7 +49,10 @@
 
   $.ajaxSetup({
     beforeSend: function (xhr, settings) {
-      if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !settings.crossDomain) {
+      if (
+        !/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) &&
+        !settings.crossDomain
+      ) {
         xhr.setRequestHeader("X-CSRFToken", csrf());
       }
     },
@@ -27,7 +64,12 @@
 
   function formatNowLabel() {
     const d = new Date();
-    return d.toLocaleString(undefined, { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" });
+    return d.toLocaleString(undefined, {
+      hour: "numeric",
+      minute: "2-digit",
+      month: "short",
+      day: "numeric",
+    });
   }
 
   function scrollToBottom() {
@@ -41,8 +83,8 @@
     $card.append(
       $("<div>", { class: "plan-card-header" }).append(
         $("<i>", { class: "fas fa-calendar-check" }),
-        document.createTextNode(" Suggested plan")
-      )
+        document.createTextNode(" Suggested plan"),
+      ),
     );
     blocks.forEach(function (b, i) {
       const start = b.start_label != null ? String(b.start_label) : "";
@@ -54,7 +96,10 @@
 
       const $row = $("<div>", { class: "plan-row" });
       $row.append(
-        $("<div>", { class: "plan-dot" }).css("background", PLAN_COLORS[i % PLAN_COLORS.length])
+        $("<div>", { class: "plan-dot" }).css(
+          "background",
+          PLAN_COLORS[i % PLAN_COLORS.length],
+        ),
       );
       $row.append($("<div>", { class: "plan-time", text: timeLabel }));
       $row.append($("<div>", { class: "plan-subject", text: title }));
@@ -71,7 +116,7 @@
         class: "msg-avatar",
         style: "background:linear-gradient(135deg,#ff6b35,#ffc94a)",
         text: userInitials,
-      })
+      }),
     );
     const $col = $("<div>");
     $col.append($("<div>", { class: "msg-bubble", text: text }));
@@ -85,8 +130,9 @@
     $msg.append(
       $("<div>", {
         class: "msg-avatar",
-        style: "background:linear-gradient(135deg,var(--accent),var(--accent2))",
-      }).append($("<i>", { class: "fas fa-robot" }))
+        style:
+          "background:linear-gradient(135deg,var(--accent),var(--accent2))",
+      }).append($("<i>", { class: "fas fa-robot" })),
     );
     const $col = $("<div>");
     const $bubble = $("<div>", { class: "msg-bubble" });
@@ -101,7 +147,12 @@
   }
 
   function appendErrorMessage(msg) {
-    appendAssistantMessage("Something went wrong: " + (msg || "Unknown error") + "\n\nPlease try again.", []);
+    appendAssistantMessage(
+      "Something went wrong: " +
+        (msg || "Unknown error") +
+        "\n\nPlease try again.",
+      [],
+    );
   }
 
   function setTyping(on) {
@@ -113,6 +164,7 @@
     const trimmed = (text || "").trim();
     if (!trimmed) return;
 
+    saveHistoryItem("you", trimmed);
     appendUserMessage(trimmed);
     $("#chatInput").val("").css("height", "auto");
     setTyping(true);
@@ -138,13 +190,16 @@
           return;
         }
         if (data.conversation_id != null) conversationId = data.conversation_id;
+        saveHistoryItem("assistant", (data && data.reply_text) || "");
         appendAssistantMessage(data.reply_text || "", data.plan_blocks || []);
         scrollToBottom();
       })
       .fail(function (xhr) {
         setTyping(false);
         const j = xhr.responseJSON;
-        appendErrorMessage((j && (j.error || j.message)) || xhr.statusText || "Network error");
+        appendErrorMessage(
+          (j && (j.error || j.message)) || xhr.statusText || "Network error",
+        );
         scrollToBottom();
       })
       .always(function () {
@@ -155,6 +210,9 @@
 
   function clearLocalChat() {
     conversationId = null;
+    try {
+      sessionStorage.removeItem(HIST_KEY);
+    } catch (e) {}
     $("#chatBody .msg").each(function () {
       const id = this.id;
       if (id !== "typingIndicator") $(this).remove();

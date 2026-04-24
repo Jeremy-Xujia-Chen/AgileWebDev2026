@@ -33,6 +33,24 @@ class User(UserMixin, db.Model):
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
+    courses = db.relationship(
+        "Course",
+        backref="user",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
+    reminders = db.relationship(
+        "Reminder",
+        backref="user",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
+    preference = db.relationship(
+        "UserPreference",
+        backref="user",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
 
     def set_password(self, password: str) -> None:
         from werkzeug.security import generate_password_hash
@@ -125,6 +143,49 @@ class RevisionTopic(db.Model):
             "status": self.status,
             "progress_percent": self.progress_percent,
         }
+
+
+class Course(db.Model):
+    __tablename__ = "courses"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    code = db.Column(db.String(32), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
+
+    def to_dict(self) -> dict:
+        return {"id": self.id, "code": self.code, "title": self.title}
+
+
+class Reminder(db.Model):
+    __tablename__ = "reminders"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    title = db.Column(db.String(200), nullable=False)
+    is_done = db.Column(db.Boolean, nullable=False, default=False)
+    due_at = db.Column(db.DateTime, nullable=True, index=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "is_done": self.is_done,
+            "due_at": self.due_at.isoformat(timespec="minutes") if self.due_at else None,
+        }
+
+
+class UserPreference(db.Model):
+    __tablename__ = "user_preferences"
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    timezone = db.Column(db.String(64), nullable=False, default="UTC")
+    week_starts_on = db.Column(db.Integer, nullable=False, default=0)
+
+    def to_dict(self) -> dict:
+        return {"timezone": self.timezone, "week_starts_on": self.week_starts_on}
 
 
 class StudyGroup(db.Model):

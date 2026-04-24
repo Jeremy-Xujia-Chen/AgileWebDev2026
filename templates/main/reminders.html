@@ -1,0 +1,30 @@
+{% extends "base_studysync.html" %}
+{% block head_extra %}
+<meta name="csrf-token" content="{{ csrf_token() }}"/>
+{% endblock %}
+{% block title %}StudySync — Reminders{% endblock %}
+{% block body %}
+{% set active_nav = 'reminders' %}
+{% include "partials/app_sidebar.html" %}
+<div class="main" id="remindersRoot">
+  <div class="topbar"><div class="page-title">Reminders</div></div>
+  <div class="calendar-wrap" style="padding:20px 28px;">
+    <div class="row g-2 mb-2 align-items-end flex-wrap" style="max-width:560px;">
+      <div class="col flex-grow-1" style="min-width:200px;">
+        <input type="text" class="form-control form-control-sm" id="rTitle" placeholder="Reminder" style="background:rgba(255,255,255,0.06);border-color:var(--border);color:var(--text);"/>
+      </div>
+      <div class="col-auto">
+        <input type="datetime-local" class="form-control form-control-sm" id="rDue" style="background:rgba(255,255,255,0.06);border-color:var(--border);color:var(--text);"/>
+      </div>
+      <div class="col-auto">
+        <button type="button" class="btn btn-sm btn-primary" id="btnAddRem"><i class="fas fa-plus"></i> Add</button>
+      </div>
+    </div>
+    <div id="remErr" class="alert alert-danger d-none py-2" style="max-width:560px;font-size:0.85rem;"></div>
+    <ul class="list-group" id="remList" style="max-width:640px;background:transparent;"></ul>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/studysync_portal.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StudySync — Timetable</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --navy: #0d1b2a;
+      --navy2: #1b2d42;
+      --card: #111f30;
+      --sidebar: #0f1e2e;
+      --accent: #4f8ef7;
+      --accent2: #7c5cfc;
+      --orange: #ff6b35;
+      --pink: #e040fb;
+      --green: #26d07c;
+      --yellow: #ffc94a;
+      --text: #e8edf5;
+      --muted: #6b839e;
+      --border: rgba(255,255,255,0.07);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 220px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 0;
+      flex-shrink: 0;
+    }
+    .brand {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--accent);
+      padding: 0 22px;
+      margin-bottom: 32px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-section-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+      padding: 0 22px;
+      margin: 18px 0 8px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 22px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      border-radius: 0;
+    }
+    .nav-item:hover, .nav-item.active {
+      color: var(--text);
+      background: rgba(79,142,247,0.1);
+    }
+    .nav-item.active { color: var(--accent); border-right: 2px solid var(--accent); }
+    .nav-item i { width: 18px; text-align: center; font-size: 0.9rem; }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 16px 22px;
+      border-top: 1px solid var(--border);
+    }
+    .user-chip {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.85rem;
+    }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: white;
+      flex-shrink: 0;
+    }
+
+    /* MAIN CONTENT */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar {
+      padding: 16px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: var(--card);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .page-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.4rem; }
+
+    .view-toggle {
+      display: flex;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 3px;
+    }
+    .view-btn {
+      padding: 6px 12px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.8rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .view-btn.active { background: var(--accent); color: white; }
+
+    .nav-arrows { display: flex; align-items: center; gap: 6px; }
+    .arrow-btn {
+      width: 32px; height: 32px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      font-size: 0.8rem;
+    }
+    .arrow-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+    .date-range {
+      font-size: 0.9rem; font-weight: 500; color: var(--text);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+    }
+
+    .btn-create {
+      background: var(--accent);
+      border: none;
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: opacity 0.2s;
+    }
+    .btn-create:hover { opacity: 0.85; }
+
+    /* FILTER TAGS */
+    .filter-bar {
+      padding: 10px 28px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+      flex-wrap: wrap;
+    }
+    .filter-icon {
+      width: 30px; height: 30px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; color: var(--muted); cursor: pointer;
+    }
+    .filter-tag {
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      border: none;
+    }
+    .filter-tag:hover { opacity: 0.8; }
+    .tag-lecture    { background: rgba(79,142,247,0.2);  color: var(--accent); }
+    .tag-lab        { background: rgba(255,107,53,0.2);  color: var(--orange); }
+    .tag-tutorial   { background: rgba(224,64,251,0.2);  color: var(--pink); }
+    .tag-exam       { background: rgba(255,50,50,0.2);   color: #ff5555; }
+    .tag-assignment { background: rgba(38,208,124,0.2);  color: var(--green); }
+    .tag-workshop   { background: rgba(255,201,74,0.2);  color: var(--yellow); }
+
+    /* CALENDAR GRID */
+    .calendar-wrap { flex: 1; overflow-y: auto; padding: 0 28px 28px; }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: 72px repeat(5, 1fr);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 20px;
+      background: var(--card);
+    }
+
+    .day-header {
+      text-align: center;
+      padding: 14px 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .day-header.today { color: var(--accent); }
+    .day-header .date-num {
+      display: block;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 2px;
+    }
+    .day-header.today .date-num {
+      background: var(--accent);
+      color: white;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 4px auto 0;
+      font-size: 1rem;
+    }
+
+    .time-col {
+      border-right: 1px solid var(--border);
+    }
+    .time-slot {
+      height: 80px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 8px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .day-col {
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+    .day-col:last-child { border-right: none; }
+
+    .cell {
+      height: 80px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      padding: 4px;
+    }
+
+    /* Events */
+    .event {
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      overflow: hidden;
+      transition: filter 0.15s, transform 0.15s;
+      position: absolute;
+      left: 4px; right: 4px;
+    }
+    .event:hover { filter: brightness(1.1); transform: scale(1.01); }
+    .event-title { font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .event-sub { color: rgba(255,255,255,0.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.7rem; }
+    .event-loc { font-size: 0.68rem; color: rgba(255,255,255,0.55); margin-top: 2px; }
+
+    .ev-lecture  { background: rgba(79,142,247,0.25); border-left: 3px solid var(--accent); color: var(--text); }
+    .ev-lab      { background: rgba(255,107,53,0.25); border-left: 3px solid var(--orange); color: var(--text); }
+    .ev-tutorial { background: rgba(224,64,251,0.25); border-left: 3px solid var(--pink); color: var(--text); }
+    .ev-exam     { background: rgba(255,50,50,0.25);  border-left: 3px solid #ff5555; color: var(--text); }
+
+    /* tall events */
+    .event.tall-2 { height: calc(160px - 12px); top: 4px; }
+    .event.tall-1 { height: calc(80px - 8px);   top: 4px; }
+
+    /* scrollbar */
+    .calendar-wrap::-webkit-scrollbar { width: 6px; }
+    .calendar-wrap::-webkit-scrollbar-track { background: transparent; }
+    .calendar-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="brand"><i class="fas fa-calendar-alt"></i> StudySync</div>
+  <span class="nav-section-label">Main</span>
+  <a href="timetable.html" class="nav-item active"><i class="fas fa-calendar-week"></i> Timetable</a>
+  <a href="ai_planner.html" class="nav-item"><i class="fas fa-robot"></i> AI Planner</a>
+  <a href="group.html" class="nav-item"><i class="fas fa-users"></i> My Group</a>
+  <span class="nav-section-label">Personal</span>
+  <a href="#" class="nav-item"><i class="fas fa-book-open"></i> Courses</a>
+  <a href="exam_detail.html" class="nav-item"><i class="fas fa-file-alt"></i> Exams &amp; Tasks</a>
+  <a href="#" class="nav-item"><i class="fas fa-bell"></i> Reminders</a>
+  <span class="nav-section-label">Settings</span>
+  <a href="#" class="nav-item"><i class="fas fa-cog"></i> Preferences</a>
+  <div class="sidebar-bottom">
+    <div class="user-chip">
+      <div class="avatar">JS</div>
+      <div>
+        <div style="font-size:0.82rem;font-weight:600;">Jane Smith</div>
+        <div style="font-size:0.72rem;color:var(--muted);">23456789</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="page-title">Timetable</div>
+      <div class="view-toggle">
+        <button class="view-btn active"><i class="fas fa-th"></i></button>
+        <button class="view-btn"><i class="fas fa-bars"></i></button>
+      </div>
+      <div class="nav-arrows">
+        <button class="arrow-btn"><i class="fas fa-chevron-left"></i></button>
+        <button class="arrow-btn"><i class="fas fa-chevron-right"></i></button>
+      </div>
+      <div class="date-range"><i class="fas fa-calendar" style="margin-right:6px;color:var(--muted)"></i>14 – 18 April 2026</div>
+    </div>
+    <button class="btn-create" onclick="window.location.href='exam_detail.html'">
+      <i class="fas fa-plus"></i> Create Event
+    </button>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="filter-icon"><i class="fas fa-filter"></i></div>
+    <button class="filter-tag tag-lecture">Lecture</button>
+    <button class="filter-tag tag-lab">Laboratory</button>
+    <button class="filter-tag tag-tutorial">Tutorial</button>
+    <button class="filter-tag tag-exam">Exam</button>
+    <button class="filter-tag tag-assignment">Assignment</button>
+    <button class="filter-tag tag-workshop">Workshop</button>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="calendar-wrap">
+    <div class="calendar-grid">
+
+      <!-- HEADER ROW -->
+      <div class="day-header" style="background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);"></div>
+      <div class="day-header"><span>Mon</span><span class="date-num">14</span></div>
+      <div class="day-header today"><span>Tue</span><span class="date-num">15</span></div>
+      <div class="day-header"><span>Wed</span><span class="date-num">16</span></div>
+      <div class="day-header"><span>Thu</span><span class="date-num">17</span></div>
+      <div class="day-header"><span>Fri</span><span class="date-num">18</span></div>
+
+      <!-- 8 AM -->
+      <div class="time-col"><div class="time-slot">8 AM</div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+
+      <!-- 9 AM -->
+      <div class="time-col"><div class="time-slot">9 AM</div></div>
+      <div class="day-col">
+        <div class="cell" style="height:160px;position:relative;">
+          <div class="event ev-lab tall-2" onclick="window.location.href='exam_detail.html'">
+            <div class="event-title">CITS3403</div>
+            <div class="event-sub">Laboratory</div>
+            <div class="event-loc"><i class="fas fa-map-marker-alt"></i> Lab 1.06</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col">
+        <div class="cell">
+          <div class="event ev-lecture tall-1">
+            <div class="event-title">CITS3403</div>
+            <div class="event-sub">Lecture — Web Dev</div>
+            <div class="event-loc"><i class="fas fa-map-marker-alt"></i> LT 225</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col">
+        <div class="cell">
+          <div class="event ev-lecture tall-1">
+            <div class="event-title">MATH2004</div>
+            <div class="event-sub">Lecture — Linear Alg</div>
+            <div class="event-loc"><i class="fas fa-map-marker-alt"></i> LT 120</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+
+      <!-- 10 AM -->
+      <div class="time-col"><div class="time-slot">10 AM</div></div>
+      <div class="day-col"><div class="cell" style="height:160px"></div></div>
+      <div class="day-col">
+        <div class="cell">
+          <div class="event ev-exam tall-1" onclick="window.location.href='exam_detail.html'">
+            <div class="event-title">⚠️ Mid-sem Test</div>
+            <div class="event-sub">CITS3403 — Room 106</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col">
+        <div class="cell">
+          <div class="event ev-tutorial tall-1">
+            <div class="event-title">CITS3403</div>
+            <div class="event-sub">Tutorial — Group 02</div>
+            <div class="event-loc"><i class="fas fa-map-marker-alt"></i> Reid 115</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col"><div class="cell"></div></div>
+
+      <!-- 11 AM -->
+      <div class="time-col"><div class="time-slot">11 AM</div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col">
+        <div class="cell">
+          <div class="event ev-tutorial tall-1">
+            <div class="event-title">MATH2004</div>
+            <div class="event-sub">Tutorial</div>
+            <div class="event-loc"><i class="fas fa-map-marker-alt"></i> Blg 205</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+
+      <!-- 12 PM -->
+      <div class="time-col"><div class="time-slot">12 PM</div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+
+      <!-- 1 PM -->
+      <div class="time-col"><div class="time-slot">1 PM</div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col">
+        <div class="cell">
+          <div class="event ev-lecture tall-1">
+            <div class="event-title">STAT2402</div>
+            <div class="event-sub">Lecture</div>
+            <div class="event-loc"><i class="fas fa-map-marker-alt"></i> LT 330</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col">
+        <div class="cell">
+          <div class="event ev-lecture tall-1">
+            <div class="event-title">STAT2402</div>
+            <div class="event-sub">Lecture</div>
+            <div class="event-loc"><i class="fas fa-map-marker-alt"></i> LT 330</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col"><div class="cell"></div></div>
+
+      <!-- 2 PM -->
+      <div class="time-col"><div class="time-slot">2 PM</div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+
+      <!-- 3 PM -->
+      <div class="time-col"><div class="time-slot">3 PM</div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col">
+        <div class="cell" style="height:160px;position:relative;">
+          <div class="event ev-lab tall-2">
+            <div class="event-title">STAT2402</div>
+            <div class="event-sub">Laboratory</div>
+            <div class="event-loc"><i class="fas fa-map-marker-alt"></i> Stats Lab</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col"><div class="cell"></div></div>
+      <div class="day-col"><div class="cell"></div></div>
+
+    </div><!-- end grid -->
+  </div><!-- end calendar-wrap -->
+</div><!-- end main -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

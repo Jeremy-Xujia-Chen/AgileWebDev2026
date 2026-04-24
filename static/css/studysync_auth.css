@@ -233,3 +233,18 @@
   .fade-in { animation: fadeIn 0.3s ease forwards; }
 
   .field-error { color: #ff8a8a; font-size: 0.8rem; margin-top: -6px; margin-bottom: 10px; }
+
+  /* Closer to source_pages/login.html: right column flex + card depth */
+  .right-panel {
+    min-width: 0;
+  }
+  .auth-box {
+    box-shadow: 0 4px 40px rgba(0, 0, 0, 0.35);
+  }
+  .btn-outline-custom:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .btn-outline-custom:disabled:hover {
+    background: transparent;
+  }

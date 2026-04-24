@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StudySync — Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --navy: #0d1b2a;
+      --navy2: #1b2d42;
+      --card: #162032;
+      --accent: #4f8ef7;
+      --accent2: #7c5cfc;
+      --orange: #ff6b35;
+      --pink: #e040fb;
+      --text: #e8edf5;
+      --muted: #7a8fa6;
+      --border: rgba(255,255,255,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Left panel */
+    .left-panel {
+      width: 55%;
+      background: linear-gradient(135deg, #0d1b2a 0%, #1a2744 50%, #0f2340 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 60px 70px;
+      position: relative;
+      overflow: hidden;
+    }
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(79,142,247,0.15) 0%, transparent 70%);
+      top: -100px; left: -100px;
+    }
+    .left-panel::after {
+      content: '';
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,92,252,0.12) 0%, transparent 70%);
+      bottom: -80px; right: 30px;
+    }
+
+    .brand {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: var(--accent);
+      margin-bottom: 60px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1;
+    }
+    .brand i { font-size: 1.5rem; }
+
+    .hero-text {
+      z-index: 1;
+    }
+    .hero-text h1 {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 2.8rem;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    .hero-text h1 span {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-text p {
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 400px;
+      margin-bottom: 40px;
+    }
+
+    .feature-pills {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 1;
+    }
+    .pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 0.9rem;
+      backdrop-filter: blur(10px);
+    }
+    .pill-icon {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    /* Right panel (form) */
+    .right-panel {
+      width: 45%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 50px;
+      background: var(--card);
+    }
+
+    .auth-box { width: 100%; max-width: 400px; }
+
+    .tab-switcher {
+      display: flex;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 32px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .form-label {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    .form-control {
+      background: rgba(255,255,255,0.05) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--text) !important;
+      border-radius: 10px !important;
+      padding: 12px 16px !important;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 3px rgba(79,142,247,0.15) !important;
+      outline: none;
+    }
+    .form-control::placeholder { color: var(--muted) !important; }
+
+    .input-group-text {
+      background: rgba(255,255,255,0.05) !important;
+      border: 1px solid var(--border) !important;
+      border-right: none !important;
+      color: var(--muted) !important;
+      border-radius: 10px 0 0 10px !important;
+    }
+    .input-group .form-control { border-left: none !important; border-radius: 0 10px 10px 0 !important; }
+
+    .btn-primary-custom {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      color: white;
+      font-family: 'Sora', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 13px;
+      border-radius: 10px;
+      width: 100%;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      letter-spacing: 0.02em;
+    }
+    .btn-primary-custom:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary-custom:active { transform: translateY(0); }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--muted); font-size: 0.82rem; margin: 22px 0;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    .btn-outline-custom {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      padding: 11px;
+      border-radius: 10px;
+      width: 100%;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-outline-custom:hover { background: rgba(255,255,255,0.06); }
+
+    .auth-footer { text-align: center; margin-top: 24px; font-size: 0.85rem; color: var(--muted); }
+    .auth-footer a { color: var(--accent); text-decoration: none; }
+
+    .mb-4-custom { margin-bottom: 18px; }
+
+    /* Register panel (hidden by default) */
+    #registerForm { display: none; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.3s ease forwards; }
+  </style>
+</head>
+<body>
+
+  <!-- Left decorative panel -->
+  <div class="left-panel">
+    <div class="brand">
+      <i class="fas fa-calendar-alt"></i> StudySync
+    </div>
+    <div class="hero-text">
+      <h1>Your campus life,<br/><span>smartly organised.</span></h1>
+      <p>Timetable management, AI-powered study planning, and team collaboration — all in one place.</p>
+    </div>
+    <div class="feature-pills">
+      <div class="pill">
+        <div class="pill-icon" style="background:rgba(79,142,247,0.15);color:var(--accent)"><i class="fas fa-calendar-week"></i></div>
+        <span>Visual weekly timetable with exam tracking</span>
+      </div>
+      <div class="pill">
+        <div class="pill-icon" style="background:rgba(124,92,252,0.15);color:var(--accent2)"><i class="fas fa-robot"></i></div>
+        <span>AI study planner that schedules your revision</span>
+      </div>
+      <div class="pill">
+        <div class="pill-icon" style="background:rgba(224,64,251,0.15);color:var(--pink)"><i class="fas fa-users"></i></div>
+        <span>See your group's schedule &amp; find meeting times</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right auth panel -->
+  <div class="right-panel">
+    <div class="auth-box">
+      <h2 style="font-family:'Sora',sans-serif;font-weight:700;font-size:1.6rem;margin-bottom:8px;">Welcome back</h2>
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:28px;">Sign in to your StudySync account</p>
+
+      <div class="tab-switcher">
+        <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn" onclick="switchTab('register')">Create Account</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="loginForm" class="fade-in">
+        <div class="mb-4-custom">
+          <label class="form-label">Email Address</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+            <input type="email" class="form-control" placeholder="you@student.uwa.edu.au" />
+          </div>
+        </div>
+        <div class="mb-4-custom">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+            <input type="password" class="form-control" placeholder="••••••••" />
+          </div>
+        </div>
+        <div style="text-align:right;margin-bottom:20px;">
+          <a href="#" style="color:var(--accent);font-size:0.85rem;text-decoration:none;">Forgot password?</a>
+        </div>
+        <button class="btn-primary-custom" onclick="window.location.href='timetable.html'">
+          Sign In &nbsp;<i class="fas fa-arrow-right"></i>
+        </button>
+        <div class="divider">or continue with</div>
+        <button class="btn-outline-custom">
+          <img src="https://www.google.com/favicon.ico" width="16" height="16"/> Google
+        </button>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="registerForm">
+        <div class="mb-4-custom">
+          <label class="form-label">Full Name</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-user"></i></span>
+            <input type="text" class="form-control" placeholder="Jane Smith" />
+          </div>
+        </div>
+        <div class="mb-4-custom">
+          <label class="form-label">Student ID</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+            <input type="text" class="form-control" placeholder="23XXXXXX" />
+          </div>
+        </div>
+        <div class="mb-4-custom">
+          <label class="form-label">Email Address</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+            <input type="email" class="form-control" placeholder="you@student.uwa.edu.au" />
+          </div>
+        </div>
+        <div class="mb-4-custom">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+            <input type="password" class="form-control" placeholder="Min. 8 characters" />
+          </div>
+        </div>
+        <button class="btn-primary-custom" onclick="window.location.href='timetable.html'">
+          Create Account &nbsp;<i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      const btns = document.querySelectorAll('.tab-btn');
+      btns.forEach(b => b.classList.remove('active'));
+      if (tab === 'login') {
+        btns[0].classList.add('active');
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('registerForm').style.display = 'none';
+        document.querySelector('h2').textContent = 'Welcome back';
+        document.querySelector('.right-panel p').textContent = 'Sign in to your StudySync account';
+      } else {
+        btns[1].classList.add('active');
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+        document.querySelector('h2').textContent = 'Get started';
+        document.querySelector('.right-panel p').textContent = 'Create your free StudySync account';
+      }
+    }
+  </script>
+</body>
+</html>
